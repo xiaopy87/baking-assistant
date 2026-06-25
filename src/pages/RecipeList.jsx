@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { SectionLabel, Card, Modal, PrimaryBtn } from '../components/UI';
@@ -15,7 +15,6 @@ function ImportModal({ show, onClose }) {
   const [imageBase64, setImageBase64] = useState(null);
   const [result, setResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
-  const fileRef = useRef();
 
   function handleFile(file) {
     if (!file) return;
@@ -73,7 +72,7 @@ function ImportModal({ show, onClose }) {
     <Modal show={show} onClose={handleClose} title="📷 拍照导入食谱" subtitle="上传食谱照片，AI 自动识别食材、步骤、烤箱参数">
       {step === 'upload' && (
         <>
-          <div className={styles.uploadZone} onClick={() => fileRef.current.click()}>
+          <label className={styles.uploadZone}>
             {preview
               ? <img src={preview} className={styles.previewImg} alt="预览" />
               : <>
@@ -82,9 +81,9 @@ function ImportModal({ show, onClose }) {
                   <div className={styles.uploadSub}>支持截图、拍照、网页保存图片</div>
                 </>
             }
-          </div>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
-            onChange={e => handleFile(e.target.files[0])} />
+            <input type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={e => handleFile(e.target.files[0])} />
+          </label>
           <PrimaryBtn onClick={handleRecognize} disabled={!imageBase64}>识别食谱</PrimaryBtn>
         </>
       )}
