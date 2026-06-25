@@ -1,0 +1,42 @@
+.page { padding-bottom: 80px; }
+.nav { padding: 16px 20px 8px; }
+.navTitle { font-size: 18px; font-weight: 600; color: var(--brown); }
+.navSub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.content { padding: 0 20px; }
+
+.statRow { display: flex; gap: 10px; margin-bottom: 8px; }
+.statCard { flex: 1; background: var(--white); border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow); text-align: center; }
+.statVal { font-size: 20px; font-weight: 700; color: var(--amber); }
+.statLabel { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.sectionRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.addBtn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--text-muted); }
+
+.ingCard {
+  background: var(--white); border-radius: var(--radius-sm);
+  padding: 14px 16px; margin-bottom: 8px; box-shadow: var(--shadow);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.ingName { font-size: 15px; font-weight: 500; color: var(--brown); }
+.ingMeta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.ingRight { text-align: right; }
+.ingPrice { font-size: 14px; font-weight: 600; color: var(--amber); margin-bottom: 4px; }
+.editBtn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; font-size: 12px; color: var(--text-muted); }
+
+.recipeCard {
+  background: var(--white); border-radius: var(--radius-sm);
+  padding: 14px 16px; margin-bottom: 8px; box-shadow: var(--shadow);
+  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+}
+.rcName { font-size: 15px; font-weight: 500; color: var(--brown); }
+.rcPortion { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.rcCost { font-size: 18px; font-weight: 700; color: var(--green); text-align: right; }
+.rcPer { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 2px; }
+
+/* Ingredient modal */
+.fieldRow { display: flex; gap: 10px; }
+.fieldRow > div { flex: 1; }
+.unitBtns { display: flex; gap: 8px; margin-top: 4px; }
+.unitBtn { flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: none; font-size: 13px; color: var(--text-muted); }
+.unitActive { background: var(--amber); color: white; border-color: var(--amber); }
+.preview { background: var(--amber-pale); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 14px; color: var(--brown); }

@@ -1,0 +1,129 @@
+.page { padding-bottom: 80px; }
+.nav { padding: 0 20px; }
+.content { padding: 0 20px; }
+
+.name { font-size: 24px; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.badge { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--amber-pale); color: var(--brown); font-weight: 500; }
+.badgeGreen { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--green-light); color: var(--green); font-weight: 500; }
+
+.portionBox {
+  background: var(--amber-pale);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.portionLabel { font-size: 13px; font-weight: 500; color: var(--brown); }
+.portionCtrl { display: flex; align-items: center; gap: 10px; }
+.pBtn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--amber);
+  background: white;
+  color: var(--amber);
+  font-size: 18px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.pVal { font-size: 18px; font-weight: 700; color: var(--brown); min-width: 28px; text-align: center; }
+.pUnit { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+
+.costBox {
+  background: var(--green-light);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.costLabel { font-size: 13px; color: var(--green); font-weight: 500; }
+.costPer { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.costVal { font-size: 20px; font-weight: 700; color: var(--green); }
+
+/* 食材分组 */
+.ingGroup { margin-bottom: 16px; }
+.groupTitle {
+  font-size: 13px; font-weight: 600; color: var(--amber);
+  background: var(--amber-pale); padding: 4px 12px;
+  border-radius: 20px; display: inline-block; margin-bottom: 8px;
+}
+.ingRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.ingName { font-size: 15px; }
+.ingRight { display: flex; align-items: baseline; gap: 8px; }
+.ingAmt { font-size: 15px; font-weight: 600; color: var(--amber); }
+.ingCost { font-size: 11px; color: var(--text-muted); }
+.groupSubtotal { font-size: 12px; color: var(--text-muted); text-align: right; padding: 6px 0 2px; }
+
+/* 多天步骤 */
+.dayBlock { margin-bottom: 20px; }
+.dayHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dayLabel {
+  font-size: 13px; font-weight: 600; color: white;
+  background: var(--brown); padding: 4px 12px; border-radius: 20px;
+}
+.dayDur { font-size: 12px; color: var(--text-muted); }
+
+.stepItem { display: flex; gap: 12px; margin-bottom: 12px; }
+.stepNum {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--amber); color: white;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.stepText { font-size: 15px; line-height: 1.6; }
+.stepMeta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.stepBadges { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+.badgeTime { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: var(--green-light); color: var(--green); }
+.badgePar { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: var(--purple-light); color: var(--purple); }
+.badgeNight { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #EDE7F6; color: #5E35B1; }
+
+.noteBox {
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  border-left: 4px solid var(--amber-light);
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* Start modal */
+.timeInput {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px; color: var(--text);
+  background: var(--cream);
+  font-family: inherit;
+}
+.timeInput:focus { border-color: var(--amber); outline: none; }
+
+.planResult {
+  border-radius: var(--radius-sm);
+  padding: 14px; margin-bottom: 14px;
+}
+.ok { background: var(--green-light); border: 1.5px solid #b2d4b7; }
+.warn { background: var(--warn-light); border: 1.5px solid var(--amber-light); }
+.danger { background: var(--red-light); border: 1.5px solid #f5b7b1; }
+
+.planTitle { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.ok .planTitle { color: var(--green); }
+.warn .planTitle { color: var(--warn); }
+.danger .planTitle { color: var(--red); }
+
+.planRow {
+  font-size: 13px; color: var(--text);
+  padding: 4px 0; display: flex; justify-content: space-between;
+}
+.time { font-weight: 600; color: var(--brown); }
+.late { color: var(--red); font-weight: 600; }
+.overnightRow { font-size: 12px; color: var(--purple); padding: 3px 0 6px; }

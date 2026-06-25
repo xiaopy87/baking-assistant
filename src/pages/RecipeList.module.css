@@ -1,0 +1,94 @@
+.page { padding-bottom: 80px; }
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 8px;
+  position: sticky;
+  top: 0;
+  background: var(--cream);
+  z-index: 10;
+}
+.navTitle { font-size: 18px; font-weight: 600; color: var(--brown); }
+.navSub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.addBtn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--amber);
+  color: white;
+  font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow);
+}
+
+.content { padding: 0 20px; }
+
+.importBanner {
+  background: var(--amber);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  color: white;
+  cursor: pointer;
+  position: relative;
+}
+.importIcon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 30px; }
+.importTitle { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.importSub { font-size: 13px; opacity: 0.85; }
+
+.recipeTag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--amber-pale);
+  color: var(--amber);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.recipeName { font-size: 17px; font-weight: 600; color: var(--brown); margin-bottom: 4px; }
+.recipeMeta { font-size: 13px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+
+.empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
+
+/* Import modal */
+.uploadZone {
+  border: 2px dashed var(--amber-light);
+  border-radius: var(--radius);
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--amber-pale);
+  margin-bottom: 14px;
+}
+.uploadIcon { font-size: 36px; margin-bottom: 6px; }
+.uploadText { font-size: 15px; color: var(--brown); font-weight: 500; }
+.uploadSub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.aiBox {
+  background: var(--amber-pale);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.aiDot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 1.2s infinite;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.aiLog { font-size: 13px; color: var(--brown); line-height: 1.8; }
+.doneBox {
+  background: var(--green-light);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.doneTitle { font-size: 14px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+.doneSub { font-size: 13px; color: var(--text-muted); }

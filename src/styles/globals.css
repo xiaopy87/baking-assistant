@@ -1,0 +1,56 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #FDF6EE;
+  --brown: #5C3D2E;
+  --brown-light: #8B6355;
+  --amber: #D4845A;
+  --amber-light: #F2C4A0;
+  --amber-pale: #FBE8D8;
+  --green: #6B8F71;
+  --green-light: #EAF2EB;
+  --purple: #7C83D3;
+  --purple-light: #ECEEF9;
+  --warn: #E07B39;
+  --warn-light: #FEF0E6;
+  --red: #C0392B;
+  --red-light: #FDECEA;
+  --text: #2C1810;
+  --text-muted: #8B7B74;
+  --border: #E8D5C4;
+  --white: #FFFFFF;
+  --shadow: 0 2px 8px rgba(92, 61, 46, 0.10);
+  --shadow-lg: 0 4px 20px rgba(92, 61, 46, 0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+input, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

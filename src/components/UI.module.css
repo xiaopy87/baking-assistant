@@ -1,0 +1,105 @@
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-block;
+}
+.brown { background: var(--amber-pale); color: var(--brown); }
+.green { background: var(--green-light); color: var(--green); }
+.purple { background: var(--purple-light); color: var(--purple); }
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s;
+  border: 1.5px solid transparent;
+}
+.card:active { transform: scale(0.98); }
+.featured { border-color: var(--amber-light); }
+
+.primaryBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--amber);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.primaryBtn:disabled { opacity: 0.4; cursor: default; }
+
+.sectionLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 16px 0 8px;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brown);
+  margin: 16px 0 8px;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--amber);
+  font-size: 15px;
+  padding: 12px 0 6px;
+  background: none;
+  border: none;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 24, 16, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 100;
+}
+.modal {
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 40px;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modalTitle { font-size: 17px; font-weight: 700; color: var(--brown); margin-bottom: 4px; }
+.modalSub { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+.modalClose {
+  float: right;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-muted);
+  margin-top: -4px;
+}
+
+.field { margin-bottom: 14px; }
+.field label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 5px; }
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--cream);
+}
+.input:focus { border-color: var(--amber); }

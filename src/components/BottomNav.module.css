@@ -1,0 +1,33 @@
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 390px;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 8px 0 16px;
+  z-index: 20;
+  box-shadow: 0 -4px 20px rgba(92, 61, 46, 0.08);
+}
+
+.item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border: none;
+  background: none;
+}
+
+.icon { font-size: 22px; }
+
+.label {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.active .label { color: var(--amber); }
