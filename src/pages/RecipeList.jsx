@@ -1,34 +1,71 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { SectionLabel, Card, Modal, PrimaryBtn } from '../components/UI';
 import styles from './RecipeList.module.css';
 
+const WORKER_URL = 'https://baking-assistant-api.xiaopy87.workers.dev';
+
 function fmtCost(n) { return '¥' + n.toFixed(1); }
 
 function ImportModal({ show, onClose }) {
-  const [step, setStep] = useState('upload'); // upload | processing | done
-  const [logLines, setLogLines] = useState([]);
+  const { saveRecipe } = useApp();
+  const [step, setStep] = useState('upload'); // upload | processing | done | error
+  const [preview, setPreview] = useState(null);
+  const [imageBase64, setImageBase64] = useState(null);
+  const [result, setResult] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const fileRef = useRef();
 
-  function simulate() {
+  function handleFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      setPreview(dataUrl);
+      setImageBase64(dataUrl.split(',')[1]);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function handleRecognize() {
+    if (!imageBase64) return;
     setStep('processing');
-    const msgs = [
-      '正在识别食谱名称…',
-      '✅ 识别到食谱名称\n正在提取食材分组…',
-      '✅ 提取食材（含分组）\n正在解析步骤与时间…',
-      '✅ 解析多天步骤完成\n检测并行任务与隔夜节点…',
-      '✅ 检测到并行任务 2 组 · 隔夜节点 1 处',
-    ];
-    let i = 0;
-    const t = setInterval(() => {
-      if (i < msgs.length) setLogLines(msgs[i++].split('\n'));
-      else { clearInterval(t); setStep('done'); }
-    }, 600);
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64 }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || '识别失败');
+      const recipe = {
+        ...data,
+        id: 'imported_' + Date.now(),
+        ingGroups: (data.ingGroups || []).map(g => ({
+          ...g,
+          ings: (g.ings || []).map(ing => ({ ...ing, ingId: ing.name })),
+        })),
+      };
+      setResult(recipe);
+      setStep('done');
+    } catch (e) {
+      setErrorMsg(e.message || '网络错误，请重试');
+      setStep('error');
+    }
+  }
+
+  function handleImport() {
+    if (result) saveRecipe(result);
+    handleClose();
   }
 
   function handleClose() {
     setStep('upload');
-    setLogLines([]);
+    setPreview(null);
+    setImageBase64(null);
+    setResult(null);
+    setErrorMsg('');
     onClose();
   }
 
@@ -36,29 +73,45 @@ function ImportModal({ show, onClose }) {
     <Modal show={show} onClose={handleClose} title="📷 拍照导入食谱" subtitle="上传食谱照片，AI 自动识别食材、步骤、烤箱参数">
       {step === 'upload' && (
         <>
-          <div className={styles.uploadZone} onClick={simulate}>
-            <div className={styles.uploadIcon}>🖼️</div>
-            <div className={styles.uploadText}>点击上传食谱照片</div>
-            <div className={styles.uploadSub}>支持截图、拍照、网页保存图片</div>
+          <div className={styles.uploadZone} onClick={() => fileRef.current.click()}>
+            {preview
+              ? <img src={preview} className={styles.previewImg} alt="预览" />
+              : <>
+                  <div className={styles.uploadIcon}>🖼️</div>
+                  <div className={styles.uploadText}>点击上传食谱照片</div>
+                  <div className={styles.uploadSub}>支持截图、拍照、网页保存图片</div>
+                </>
+            }
           </div>
-          <PrimaryBtn disabled>识别食谱</PrimaryBtn>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={e => handleFile(e.target.files[0])} />
+          <PrimaryBtn onClick={handleRecognize} disabled={!imageBase64}>识别食谱</PrimaryBtn>
         </>
       )}
       {step === 'processing' && (
         <div className={styles.aiBox}>
           <div className={styles.aiDot} />
-          <div className={styles.aiLog}>
-            {logLines.map((l, i) => <div key={i}>{l}</div>)}
-          </div>
+          <div className={styles.aiLog}>正在识别食谱，请稍候…</div>
         </div>
       )}
-      {step === 'done' && (
+      {step === 'done' && result && (
         <>
           <div className={styles.doneBox}>
             <div className={styles.doneTitle}>✅ 识别完成</div>
-            <div className={styles.doneSub}>已识别出食谱 · 2天计划 · 多组食材 · 并行任务已标注</div>
+            <div className={styles.doneSub}>
+              {result.name} · {result.ingGroups?.length}组食材 · {result.days?.length}天计划
+            </div>
           </div>
-          <PrimaryBtn onClick={handleClose}>导入食谱 →</PrimaryBtn>
+          <PrimaryBtn onClick={handleImport}>导入食谱 →</PrimaryBtn>
+        </>
+      )}
+      {step === 'error' && (
+        <>
+          <div className={styles.errorBox}>
+            <div className={styles.errorTitle}>❌ 识别失败</div>
+            <div className={styles.doneSub}>{errorMsg}</div>
+          </div>
+          <PrimaryBtn onClick={() => setStep('upload')}>重新上传</PrimaryBtn>
         </>
       )}
     </Modal>

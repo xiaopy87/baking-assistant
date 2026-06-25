@@ -92,3 +92,11 @@
 }
 .doneTitle { font-size: 14px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
 .doneSub { font-size: 13px; color: var(--text-muted); }
+.errorBox {
+  background: var(--red-light);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.errorTitle { font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+.previewImg { width: 100%; border-radius: var(--radius-sm); display: block; }
