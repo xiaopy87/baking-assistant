@@ -18,13 +18,21 @@ function ImportModal({ show, onClose }) {
 
   function handleFile(file) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target.result;
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 1024;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      URL.revokeObjectURL(url);
       setPreview(dataUrl);
       setImageBase64(dataUrl.split(',')[1]);
     };
-    reader.readAsDataURL(file);
+    img.src = url;
   }
 
   async function handleRecognize() {

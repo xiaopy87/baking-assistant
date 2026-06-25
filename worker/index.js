@@ -1,4 +1,4 @@
-const ALLOWED_ORIGIN = 'https://xiaopy87.github.io';
+const ALLOWED_ORIGIN = '*';
 
 export default {
   async fetch(request, env) {
@@ -68,10 +68,20 @@ export default {
     });
 
     const data = await response.json();
+    console.log('DashScope status:', response.status);
+    console.log('DashScope response:', JSON.stringify(data).slice(0, 500));
     const content = data.choices?.[0]?.message?.content ?? '';
+
+    if (!response.ok) {
+      return new Response(JSON.stringify({ error: `API错误: ${response.status} ${data.message || data.error?.message || ''}` }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': ALLOWED_ORIGIN },
+      });
+    }
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.log('No JSON found in content:', content.slice(0, 200));
       return new Response(JSON.stringify({ error: '解析失败，请重试' }), {
         status: 422,
         headers: {
