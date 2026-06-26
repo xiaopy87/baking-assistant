@@ -40,7 +40,7 @@ function ImportModal({ show, onClose }) {
     setStep('processing');
     console.log('[识别] 开始，图片大小:', Math.round(imageBase64.length / 1024), 'KB');
     try {
-      const res = await fetch(WORKER_URL, {
+      const res = await fetch(`${WORKER_URL}/api/recognize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64 }),

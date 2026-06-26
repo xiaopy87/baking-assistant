@@ -1,36 +1,38 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { INITIAL_ING_LIB, INITIAL_RECIPES } from '../data/initialData';
 
 const AppContext = createContext(null);
 
-function load(key, fallback) {
-  try {
-    const v = localStorage.getItem(key);
-    return v ? JSON.parse(v) : fallback;
-  } catch { return fallback; }
-}
+const API = import.meta.env.VITE_API_URL || 'https://baking-assistant-api.xiaopy87.workers.dev';
 
-function save(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+async function apiFetch(path, options) {
+  const res = await fetch(`${API}${path}`, options);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
 
 export function AppProvider({ children }) {
-  const [ingLib, setIngLib] = useState(() => load('ingLib', INITIAL_ING_LIB));
-  const [recipes, setRecipes] = useState(() => load('recipes', INITIAL_RECIPES));
+  const [ingLib, setIngLib] = useState({});
+  const [recipes, setRecipes] = useState([]);
   const [portions, setPortions] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => { save('ingLib', ingLib); }, [ingLib]);
-  useEffect(() => { save('recipes', recipes); }, [recipes]);
+  useEffect(() => {
+    Promise.all([
+      apiFetch('/api/recipes'),
+      apiFetch('/api/ing-lib'),
+    ]).then(([r, lib]) => {
+      setRecipes(r);
+      setIngLib(lib);
+    }).finally(() => setLoading(false));
+  }, []);
 
-  // ── cost helpers ──
   function unitPrice(ingId) {
     const ing = ingLib[ingId];
     return ing ? ing.price / ing.qty : 0;
   }
 
   function recipeCost(recipe, portion) {
-    const base = recipe.portion;
-    const ratio = portion / base;
+    const ratio = portion / recipe.portion;
     let total = 0;
     recipe.ingGroups.forEach(g =>
       g.ings.forEach(ing => {
@@ -49,38 +51,44 @@ export function AppProvider({ children }) {
     setPortions(p => ({ ...p, [recipeId]: Math.max(1, val) }));
   }
 
-  // ── ingredient lib ──
-  function saveIng(id, data) {
+  async function saveIng(id, data) {
+    await apiFetch('/api/ing-lib', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...data }),
+    });
     setIngLib(prev => ({ ...prev, [id]: data }));
   }
 
-  function deleteIng(id) {
+  async function deleteIng(id) {
+    await apiFetch(`/api/ing-lib/${id}`, { method: 'DELETE' });
     setIngLib(prev => { const n = { ...prev }; delete n[id]; return n; });
   }
 
-  // ── recipes ──
-  function saveRecipe(recipe) {
+  async function saveRecipe(recipe) {
+    const exists = recipes.find(r => r.id === recipe.id);
+    await apiFetch(exists ? `/api/recipes/${recipe.id}` : '/api/recipes', {
+      method: exists ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(recipe),
+    });
     setRecipes(prev => {
       const idx = prev.findIndex(r => r.id === recipe.id);
-      if (idx >= 0) {
-        const next = [...prev];
-        next[idx] = recipe;
-        return next;
-      }
+      if (idx >= 0) { const next = [...prev]; next[idx] = recipe; return next; }
       return [...prev, recipe];
     });
   }
 
-  function deleteRecipe(id) {
+  async function deleteRecipe(id) {
+    await apiFetch(`/api/recipes/${id}`, { method: 'DELETE' });
     setRecipes(prev => prev.filter(r => r.id !== id));
   }
 
   return (
     <AppContext.Provider value={{
-      ingLib, recipes,
+      ingLib, recipes, loading,
       unitPrice, recipeCost, getPortion, setPortion,
-      saveIng, deleteIng,
-      saveRecipe, deleteRecipe,
+      saveIng, deleteIng, saveRecipe, deleteRecipe,
     }}>
       {children}
     </AppContext.Provider>
