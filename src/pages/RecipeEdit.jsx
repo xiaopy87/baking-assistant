@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { BackBtn, SectionTitle, PrimaryBtn, Field, TextInput } from '../components/UI';
+import { CATEGORIES } from '../data/categories';
 import styles from './RecipeEdit.module.css';
 
 function newId() {
@@ -18,9 +19,13 @@ export default function RecipeEdit() {
 
   const [name, setName] = useState(original.name);
   const [tag, setTag] = useState(original.tag);
+  const [category, setCategory] = useState(original.category || '');
+  const [subCategory, setSubCategory] = useState(original.subCategory || '');
   const [portion, setPortion] = useState(original.portion);
   const [portionUnit, setPortionUnit] = useState(original.portionUnit);
   const [notes, setNotes] = useState(original.notes);
+
+  const currentCat = CATEGORIES.find(c => c.id === category);
   const [ingGroups, setIngGroups] = useState(
     original.ingGroups.map(g => ({ ...g, ings: g.ings.map(i => ({ ...i })) }))
   );
@@ -109,7 +114,7 @@ export default function RecipeEdit() {
       });
       return { ...day, tasks: processed };
     });
-    await saveRecipe({ ...original, name, tag, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays });
+    await saveRecipe({ ...original, name, tag, category, subCategory, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays });
     navigate(`/recipe/${id}`);
   }
 
@@ -123,7 +128,21 @@ export default function RecipeEdit() {
       <div className={styles.content}>
         <SectionTitle>基本信息</SectionTitle>
         <Field label="食谱名称"><TextInput value={name} onChange={setName} /></Field>
-        <Field label="分类"><TextInput value={tag} onChange={setTag} /></Field>
+        <Field label="标签"><TextInput value={tag} onChange={setTag} /></Field>
+        <Field label="一级分类">
+          <select className={styles.select} value={category} onChange={e => { setCategory(e.target.value); setSubCategory(''); }}>
+            <option value="">请选择</option>
+            {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </Field>
+        {currentCat && (
+          <Field label="二级分类">
+            <select className={styles.select} value={subCategory} onChange={e => setSubCategory(e.target.value)}>
+              <option value="">请选择</option>
+              {currentCat.sub.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </Field>
+        )}
         <div className={styles.row}>
           <Field label="份量">
             <TextInput type="number" value={portion} onChange={setPortion} />

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { SectionLabel, Card, Modal, PrimaryBtn } from '../components/UI';
+import { CATEGORIES } from '../data/categories';
 import styles from './RecipeList.module.css';
 
 const WORKER_URL = import.meta.env.VITE_API_URL || 'https://baking-assistant-api.xiaopy87.workers.dev';
@@ -10,7 +11,7 @@ function fmtCost(n) { return '¥' + n.toFixed(1); }
 
 function ImportModal({ show, onClose }) {
   const { saveRecipe } = useApp();
-  const [step, setStep] = useState('upload'); // upload | processing | done | error
+  const [step, setStep] = useState('upload');
   const [preview, setPreview] = useState(null);
   const [imageBase64, setImageBase64] = useState(null);
   const [result, setResult] = useState(null);
@@ -132,10 +133,30 @@ export default function RecipeList() {
   const navigate = useNavigate();
   const { recipes, recipeCost, getPortion } = useApp();
   const [showImport, setShowImport] = useState(false);
+  const [activeCat, setActiveCat] = useState(null); // null = 全部
+  const [activeSub, setActiveSub] = useState(null);
+
+  function handleCatClick(catId) {
+    if (activeCat === catId) {
+      setActiveCat(null);
+      setActiveSub(null);
+    } else {
+      setActiveCat(catId);
+      setActiveSub(null);
+    }
+  }
+
+  const currentCat = CATEGORIES.find(c => c.id === activeCat);
+
+  const filtered = recipes.filter(r => {
+    if (!activeCat) return true;
+    if (r.category !== activeCat) return false;
+    if (!activeSub) return true;
+    return r.subCategory === activeSub;
+  });
 
   return (
     <div className={styles.page}>
-      {/* Header */}
       <div className={styles.nav}>
         <div>
           <div className={styles.navTitle}>🧁 烘焙助手</div>
@@ -144,17 +165,51 @@ export default function RecipeList() {
         <button className={styles.addBtn} onClick={() => setShowImport(true)}>＋</button>
       </div>
 
+      {/* 一级分类 Tab */}
+      <div className={styles.catBar}>
+        <button
+          className={`${styles.catTab} ${!activeCat ? styles.catActive : ''}`}
+          onClick={() => { setActiveCat(null); setActiveSub(null); }}
+        >全部</button>
+        {CATEGORIES.map(c => (
+          <button
+            key={c.id}
+            className={`${styles.catTab} ${activeCat === c.id ? styles.catActive : ''}`}
+            onClick={() => handleCatClick(c.id)}
+          >{c.name}</button>
+        ))}
+      </div>
+
+      {/* 二级分类 Tab */}
+      {currentCat && (
+        <div className={styles.subBar}>
+          <button
+            className={`${styles.subTab} ${!activeSub ? styles.subActive : ''}`}
+            onClick={() => setActiveSub(null)}
+          >全部</button>
+          {currentCat.sub.map(s => (
+            <button
+              key={s}
+              className={`${styles.subTab} ${activeSub === s ? styles.subActive : ''}`}
+              onClick={() => setActiveSub(s)}
+            >{s}</button>
+          ))}
+        </div>
+      )}
+
       <div className={styles.content}>
-        {/* Import banner */}
         <div className={styles.importBanner} onClick={() => setShowImport(true)}>
           <span className={styles.importIcon}>📷</span>
           <div className={styles.importTitle}>拍照导入食谱</div>
           <div className={styles.importSub}>上传照片，AI 自动识别并整理</div>
         </div>
 
-        <SectionLabel>全部食谱</SectionLabel>
+        <SectionLabel>
+          {currentCat ? `${currentCat.name}${activeSub ? ' · ' + activeSub : ''}` : '全部食谱'}
+          <span className={styles.recipeCount}>{filtered.length} 个</span>
+        </SectionLabel>
 
-        {recipes.map((r, idx) => {
+        {filtered.map((r, idx) => {
           const p = getPortion(r.id, r.portion);
           const cost = recipeCost(r, p);
           const totalDays = r.days.length;
@@ -176,8 +231,10 @@ export default function RecipeList() {
           );
         })}
 
-        {recipes.length === 0 && (
-          <div className={styles.empty}>还没有食谱，点击上方导入或添加吧 🥐</div>
+        {filtered.length === 0 && (
+          <div className={styles.empty}>
+            {activeCat ? '这个分类还没有食谱，导入一个吧 🥐' : '还没有食谱，点击上方导入或添加吧 🥐'}
+          </div>
         )}
       </div>
 

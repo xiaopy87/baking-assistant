@@ -136,7 +136,7 @@ async function handleRequest(req, res) {
       "tasks": [
         {
           "id": "唯一短id如t1",
-          "name": "步骤简短标题（5字以内）",
+          "name": "步骤简短标题（10字以内）",
           "meta": "详细操作说明（补充温度/手法/注意点，与name不重复）",
           "totalSec": 秒数,
           "serial": true,

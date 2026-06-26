@@ -25,6 +25,62 @@
 
 .content { padding: 0 20px; }
 
+/* 分类 Tab */
+.catBar {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--cream);
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+}
+.catBar::-webkit-scrollbar { display: none; }
+.catTab {
+  flex-shrink: 0;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.catActive {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: white;
+}
+
+.subBar {
+  display: flex;
+  gap: 6px;
+  padding: 0 20px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--cream);
+}
+.subBar::-webkit-scrollbar { display: none; }
+.subTab {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.subActive {
+  background: var(--amber-pale);
+  border-color: var(--amber);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.recipeCount { font-size: 12px; color: var(--text-muted); margin-left: 6px; font-weight: 400; }
+
 .importBanner {
   background: var(--amber);
   border-radius: var(--radius);

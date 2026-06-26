@@ -16,6 +16,18 @@
 .content { padding: 0 20px; }
 
 .row { display: flex; gap: 12px; }
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--cream);
+  font-family: inherit;
+  appearance: none;
+}
+.select:focus { border-color: var(--amber); outline: none; }
 .row > * { flex: 1; }
 
 .group {
