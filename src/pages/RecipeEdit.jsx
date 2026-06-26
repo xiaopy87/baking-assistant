@@ -90,7 +90,26 @@ export default function RecipeEdit() {
   }
 
   async function handleSave() {
-    await saveRecipe({ ...original, name, tag, portion: Number(portion), portionUnit, notes, ingGroups, days });
+    // 根据 parGroup 自动配对 parWith 和 serial
+    const processedDays = days.map(day => {
+      const tasks = day.tasks;
+      const groupMap = {};
+      tasks.forEach(t => {
+        if (t.parGroup) {
+          if (!groupMap[t.parGroup]) groupMap[t.parGroup] = [];
+          groupMap[t.parGroup].push(t);
+        }
+      });
+      const processed = tasks.map(t => {
+        if (!t.parGroup) return { ...t, parWith: null, serial: true };
+        const group = groupMap[t.parGroup];
+        const other = group.find(x => x.id !== t.id);
+        const isLonger = !other || t.totalSec >= other.totalSec;
+        return { ...t, parWith: other?.id ?? null, serial: isLonger };
+      });
+      return { ...day, tasks: processed };
+    });
+    await saveRecipe({ ...original, name, tag, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays });
     navigate(`/recipe/${id}`);
   }
 
@@ -192,6 +211,15 @@ export default function RecipeEdit() {
                   onChange={val => updateTask(di, ti, 'meta', val)}
                   placeholder="步骤说明"
                 />
+                <div className={styles.parRow}>
+                  <span className={styles.parLabel}>↔ 并行组</span>
+                  <TextInput
+                    className={styles.parInput}
+                    value={t.parGroup || ''}
+                    onChange={val => updateTask(di, ti, 'parGroup', val.toUpperCase() || null)}
+                    placeholder="如 A（留空表示串行）"
+                  />
+                </div>
               </div>
             ))}
             <button className={styles.addBtn} onClick={() => addTask(di)}>＋ 添加步骤</button>

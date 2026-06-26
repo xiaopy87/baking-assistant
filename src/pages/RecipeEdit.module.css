@@ -83,6 +83,15 @@
 .taskMin input { width: 56px; }
 .minLabel { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
 
+.parRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.parLabel { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.parInput { flex: 1; font-size: 13px; }
+
 .addBtn {
   font-size: 13px;
   color: var(--amber);

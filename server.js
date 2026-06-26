@@ -134,11 +134,24 @@ async function handleRequest(req, res) {
     {
       "label": "第1天",
       "tasks": [
-        { "name": "步骤简短标题（5字以内）", "meta": "详细操作说明（与name不同，补充温度/手法/注意点等细节）", "totalSec": 秒数, "serial": true }
+        {
+          "id": "唯一短id如t1",
+          "name": "步骤简短标题（5字以内）",
+          "meta": "详细操作说明（补充温度/手法/注意点，与name不重复）",
+          "totalSec": 秒数,
+          "serial": true,
+          "parGroup": "并行组标识（如A/B/C，只有可同时进行的步骤才填，其余留null）",
+          "parWith": "并行的另一个步骤id（没有并行则留null）"
+        }
       ]
     }
   ]
-}`,
+}
+
+并行规则：
+- 若两个步骤可以同时进行（如"发酵"和"预热烤箱"），给它们相同的parGroup（如"A"），并互相填写parWith为对方的id
+- 耗时较长的那个serial设为true，另一个serial设为false
+- 没有并行关系的步骤parGroup和parWith均为null`,
             },
           ],
         }],
