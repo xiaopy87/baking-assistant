@@ -134,7 +134,7 @@ async function handleRequest(req, res) {
     {
       "label": "第1天",
       "tasks": [
-        { "name": "步骤名称", "meta": "详细说明", "totalSec": 秒数, "serial": true }
+        { "name": "步骤简短标题（5字以内）", "meta": "详细操作说明（与name不同，补充温度/手法/注意点等细节）", "totalSec": 秒数, "serial": true }
       ]
     }
   ]
