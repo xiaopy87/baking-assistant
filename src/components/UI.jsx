@@ -60,10 +60,10 @@ export function Field({ label, children }) {
   );
 }
 
-export function TextInput({ value, onChange, placeholder, type = 'text' }) {
+export function TextInput({ value, onChange, placeholder, type = 'text', className }) {
   return (
     <input
-      className={styles.input}
+      className={`${styles.input} ${className || ''}`}
       type={type}
       value={value}
       onChange={e => onChange(e.target.value)}

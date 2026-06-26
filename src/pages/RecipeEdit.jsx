@@ -103,14 +103,14 @@ export default function RecipeEdit() {
 
       <div className={styles.content}>
         <SectionTitle>基本信息</SectionTitle>
-        <Field label="食谱名称"><TextInput value={name} onChange={e => setName(e.target.value)} /></Field>
-        <Field label="分类"><TextInput value={tag} onChange={e => setTag(e.target.value)} /></Field>
+        <Field label="食谱名称"><TextInput value={name} onChange={setName} /></Field>
+        <Field label="分类"><TextInput value={tag} onChange={setTag} /></Field>
         <div className={styles.row}>
           <Field label="份量">
-            <TextInput type="number" value={portion} onChange={e => setPortion(e.target.value)} />
+            <TextInput type="number" value={portion} onChange={setPortion} />
           </Field>
           <Field label="单位">
-            <TextInput value={portionUnit} onChange={e => setPortionUnit(e.target.value)} />
+            <TextInput value={portionUnit} onChange={setPortionUnit} />
           </Field>
         </div>
 
@@ -122,7 +122,7 @@ export default function RecipeEdit() {
               <TextInput
                 className={styles.groupName}
                 value={g.groupName}
-                onChange={e => updateGroupName(gi, e.target.value)}
+                onChange={val => updateGroupName(gi, val)}
                 placeholder="分组名称"
               />
               <button className={styles.removeBtn} onClick={() => removeGroup(gi)}>删除组</button>
@@ -132,19 +132,19 @@ export default function RecipeEdit() {
                 <TextInput
                   className={styles.ingName}
                   value={ing.name}
-                  onChange={e => updateIng(gi, ii, 'name', e.target.value)}
+                  onChange={val => updateIng(gi, ii, 'name', val)}
                   placeholder="食材名"
                 />
                 <TextInput
                   className={styles.ingAmt}
                   type="number"
                   value={ing.amount}
-                  onChange={e => updateIng(gi, ii, 'amount', e.target.value)}
+                  onChange={val => updateIng(gi, ii, 'amount', val)}
                 />
                 <TextInput
                   className={styles.ingUnit}
                   value={ing.unit}
-                  onChange={e => updateIng(gi, ii, 'unit', e.target.value)}
+                  onChange={val => updateIng(gi, ii, 'unit', val)}
                   placeholder="单位"
                 />
                 <button className={styles.iconBtn} onClick={() => removeIng(gi, ii)}>✕</button>
@@ -163,7 +163,7 @@ export default function RecipeEdit() {
               <TextInput
                 className={styles.groupName}
                 value={day.label}
-                onChange={e => updateDayLabel(di, e.target.value)}
+                onChange={val => updateDayLabel(di, val)}
                 placeholder="天数标签"
               />
               <button className={styles.removeBtn} onClick={() => removeDay(di)}>删除天</button>
@@ -174,14 +174,14 @@ export default function RecipeEdit() {
                   <TextInput
                     className={styles.taskName}
                     value={t.name}
-                    onChange={e => updateTask(di, ti, 'name', e.target.value)}
+                    onChange={val => updateTask(di, ti, 'name', val)}
                     placeholder="步骤名称"
                   />
                   <div className={styles.taskMin}>
                     <TextInput
                       type="number"
                       value={Math.round(t.totalSec / 60)}
-                      onChange={e => updateTask(di, ti, 'totalSec', e.target.value)}
+                      onChange={val => updateTask(di, ti, 'totalSec', val)}
                     />
                     <span className={styles.minLabel}>分钟</span>
                   </div>
@@ -189,7 +189,7 @@ export default function RecipeEdit() {
                 </div>
                 <TextInput
                   value={t.meta}
-                  onChange={e => updateTask(di, ti, 'meta', e.target.value)}
+                  onChange={val => updateTask(di, ti, 'meta', val)}
                   placeholder="步骤说明"
                 />
               </div>
