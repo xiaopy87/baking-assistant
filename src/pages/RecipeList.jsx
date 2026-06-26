@@ -4,7 +4,7 @@ import { useApp } from '../store/AppContext';
 import { SectionLabel, Card, Modal, PrimaryBtn } from '../components/UI';
 import styles from './RecipeList.module.css';
 
-const WORKER_URL = 'https://baking-assistant-api.xiaopy87.workers.dev';
+const WORKER_URL = import.meta.env.VITE_API_URL || 'https://baking-assistant-api.xiaopy87.workers.dev';
 
 function fmtCost(n) { return '¥' + n.toFixed(1); }
 
@@ -38,13 +38,16 @@ function ImportModal({ show, onClose }) {
   async function handleRecognize() {
     if (!imageBase64) return;
     setStep('processing');
+    console.log('[识别] 开始，图片大小:', Math.round(imageBase64.length / 1024), 'KB');
     try {
       const res = await fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64 }),
       });
+      console.log('[识别] Worker 响应状态:', res.status);
       const data = await res.json();
+      console.log('[识别] 返回数据:', data);
       if (!res.ok || data.error) throw new Error(data.error || '识别失败');
       const recipe = {
         ...data,
