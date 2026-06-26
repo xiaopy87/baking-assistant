@@ -120,6 +120,7 @@ export default function RecipeDetail() {
     <div className={styles.page}>
       <div className={styles.nav}>
         <BackBtn onClick={() => navigate('/')} />
+        <button className={styles.editBtn} onClick={() => navigate(`/recipe/${id}/edit`)}>编辑</button>
       </div>
 
       <div className={styles.content}>

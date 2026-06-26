@@ -1,0 +1,121 @@
+.page { padding-bottom: 80px; }
+.nav {
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.saveBtn {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--amber);
+  background: none;
+  border: none;
+  padding: 8px 4px;
+}
+.content { padding: 0 20px; }
+
+.row { display: flex; gap: 12px; }
+.row > * { flex: 1; }
+
+.group {
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.groupName { flex: 1; font-weight: 600; }
+.removeBtn {
+  font-size: 12px;
+  color: var(--red);
+  background: none;
+  border: 1px solid var(--red);
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.ingRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.ingName { flex: 3; }
+.ingAmt { flex: 2; }
+.ingUnit { flex: 2; }
+
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskRow { margin-bottom: 10px; }
+.taskTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.taskName { flex: 1; }
+.taskMin {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.taskMin input { width: 56px; }
+.minLabel { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+
+.addBtn {
+  font-size: 13px;
+  color: var(--amber);
+  background: none;
+  border: 1px dashed var(--amber-light);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+.addGroupBtn {
+  font-size: 14px;
+  color: var(--amber);
+  background: none;
+  border: 1.5px dashed var(--amber);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.notes {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--cream);
+  line-height: 1.8;
+  resize: vertical;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+.notes:focus { border-color: var(--amber); outline: none; }

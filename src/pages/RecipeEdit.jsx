@@ -1,0 +1,216 @@
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useApp } from '../store/AppContext';
+import { BackBtn, SectionTitle, PrimaryBtn, Field, TextInput } from '../components/UI';
+import styles from './RecipeEdit.module.css';
+
+function newId() {
+  return 't_' + Math.random().toString(36).slice(2, 8);
+}
+
+export default function RecipeEdit() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { recipes, saveRecipe } = useApp();
+
+  const original = recipes.find(r => r.id === id);
+  if (!original) return <div style={{ padding: 20 }}>食谱不存在</div>;
+
+  const [name, setName] = useState(original.name);
+  const [tag, setTag] = useState(original.tag);
+  const [portion, setPortion] = useState(original.portion);
+  const [portionUnit, setPortionUnit] = useState(original.portionUnit);
+  const [notes, setNotes] = useState(original.notes);
+  const [ingGroups, setIngGroups] = useState(
+    original.ingGroups.map(g => ({ ...g, ings: g.ings.map(i => ({ ...i })) }))
+  );
+  const [days, setDays] = useState(
+    original.days.map(d => ({ ...d, tasks: d.tasks.map(t => ({ ...t })) }))
+  );
+
+  // ── 食材操作 ──
+  function updateGroupName(gi, val) {
+    setIngGroups(gs => gs.map((g, i) => i === gi ? { ...g, groupName: val } : g));
+  }
+  function addGroup() {
+    setIngGroups(gs => [...gs, { groupName: '新分组', ings: [] }]);
+  }
+  function removeGroup(gi) {
+    setIngGroups(gs => gs.filter((_, i) => i !== gi));
+  }
+  function updateIng(gi, ii, field, val) {
+    setIngGroups(gs => gs.map((g, i) => i !== gi ? g : {
+      ...g,
+      ings: g.ings.map((ing, j) => j !== ii ? ing : { ...ing, [field]: field === 'amount' ? Number(val) : val }),
+    }));
+  }
+  function addIng(gi) {
+    setIngGroups(gs => gs.map((g, i) => i !== gi ? g : {
+      ...g,
+      ings: [...g.ings, { name: '', ingId: '', amount: 0, unit: 'g' }],
+    }));
+  }
+  function removeIng(gi, ii) {
+    setIngGroups(gs => gs.map((g, i) => i !== gi ? g : {
+      ...g,
+      ings: g.ings.filter((_, j) => j !== ii),
+    }));
+  }
+
+  // ── 步骤操作 ──
+  function updateDayLabel(di, val) {
+    setDays(ds => ds.map((d, i) => i === di ? { ...d, label: val } : d));
+  }
+  function addDay() {
+    setDays(ds => [...ds, { label: `第${ds.length + 1}天`, tasks: [] }]);
+  }
+  function removeDay(di) {
+    setDays(ds => ds.filter((_, i) => i !== di));
+  }
+  function updateTask(di, ti, field, val) {
+    setDays(ds => ds.map((d, i) => i !== di ? d : {
+      ...d,
+      tasks: d.tasks.map((t, j) => j !== ti ? t : {
+        ...t,
+        [field]: field === 'totalSec' ? Number(val) * 60 : val,
+      }),
+    }));
+  }
+  function addTask(di) {
+    setDays(ds => ds.map((d, i) => i !== di ? d : {
+      ...d,
+      tasks: [...d.tasks, { id: newId(), name: '', meta: '', totalSec: 600, serial: true }],
+    }));
+  }
+  function removeTask(di, ti) {
+    setDays(ds => ds.map((d, i) => i !== di ? d : {
+      ...d,
+      tasks: d.tasks.filter((_, j) => j !== ti),
+    }));
+  }
+
+  async function handleSave() {
+    await saveRecipe({ ...original, name, tag, portion: Number(portion), portionUnit, notes, ingGroups, days });
+    navigate(`/recipe/${id}`);
+  }
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.nav}>
+        <BackBtn onClick={() => navigate(`/recipe/${id}`)} />
+        <button className={styles.saveBtn} onClick={handleSave}>保存</button>
+      </div>
+
+      <div className={styles.content}>
+        <SectionTitle>基本信息</SectionTitle>
+        <Field label="食谱名称"><TextInput value={name} onChange={e => setName(e.target.value)} /></Field>
+        <Field label="分类"><TextInput value={tag} onChange={e => setTag(e.target.value)} /></Field>
+        <div className={styles.row}>
+          <Field label="份量">
+            <TextInput type="number" value={portion} onChange={e => setPortion(e.target.value)} />
+          </Field>
+          <Field label="单位">
+            <TextInput value={portionUnit} onChange={e => setPortionUnit(e.target.value)} />
+          </Field>
+        </div>
+
+        {/* 食材 */}
+        <SectionTitle>🧂 食材</SectionTitle>
+        {ingGroups.map((g, gi) => (
+          <div key={gi} className={styles.group}>
+            <div className={styles.groupHeader}>
+              <TextInput
+                className={styles.groupName}
+                value={g.groupName}
+                onChange={e => updateGroupName(gi, e.target.value)}
+                placeholder="分组名称"
+              />
+              <button className={styles.removeBtn} onClick={() => removeGroup(gi)}>删除组</button>
+            </div>
+            {g.ings.map((ing, ii) => (
+              <div key={ii} className={styles.ingRow}>
+                <TextInput
+                  className={styles.ingName}
+                  value={ing.name}
+                  onChange={e => updateIng(gi, ii, 'name', e.target.value)}
+                  placeholder="食材名"
+                />
+                <TextInput
+                  className={styles.ingAmt}
+                  type="number"
+                  value={ing.amount}
+                  onChange={e => updateIng(gi, ii, 'amount', e.target.value)}
+                />
+                <TextInput
+                  className={styles.ingUnit}
+                  value={ing.unit}
+                  onChange={e => updateIng(gi, ii, 'unit', e.target.value)}
+                  placeholder="单位"
+                />
+                <button className={styles.iconBtn} onClick={() => removeIng(gi, ii)}>✕</button>
+              </div>
+            ))}
+            <button className={styles.addBtn} onClick={() => addIng(gi)}>＋ 添加食材</button>
+          </div>
+        ))}
+        <button className={styles.addGroupBtn} onClick={addGroup}>＋ 添加分组</button>
+
+        {/* 步骤 */}
+        <SectionTitle>📋 制作步骤</SectionTitle>
+        {days.map((day, di) => (
+          <div key={di} className={styles.group}>
+            <div className={styles.groupHeader}>
+              <TextInput
+                className={styles.groupName}
+                value={day.label}
+                onChange={e => updateDayLabel(di, e.target.value)}
+                placeholder="天数标签"
+              />
+              <button className={styles.removeBtn} onClick={() => removeDay(di)}>删除天</button>
+            </div>
+            {day.tasks.map((t, ti) => (
+              <div key={ti} className={styles.taskRow}>
+                <div className={styles.taskTop}>
+                  <TextInput
+                    className={styles.taskName}
+                    value={t.name}
+                    onChange={e => updateTask(di, ti, 'name', e.target.value)}
+                    placeholder="步骤名称"
+                  />
+                  <div className={styles.taskMin}>
+                    <TextInput
+                      type="number"
+                      value={Math.round(t.totalSec / 60)}
+                      onChange={e => updateTask(di, ti, 'totalSec', e.target.value)}
+                    />
+                    <span className={styles.minLabel}>分钟</span>
+                  </div>
+                  <button className={styles.iconBtn} onClick={() => removeTask(di, ti)}>✕</button>
+                </div>
+                <TextInput
+                  value={t.meta}
+                  onChange={e => updateTask(di, ti, 'meta', e.target.value)}
+                  placeholder="步骤说明"
+                />
+              </div>
+            ))}
+            <button className={styles.addBtn} onClick={() => addTask(di)}>＋ 添加步骤</button>
+          </div>
+        ))}
+        <button className={styles.addGroupBtn} onClick={addDay}>＋ 添加天数</button>
+
+        {/* 注意事项 */}
+        <SectionTitle>📌 注意事项</SectionTitle>
+        <textarea
+          className={styles.notes}
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          rows={5}
+          placeholder="每行一条注意事项"
+        />
+
+        <PrimaryBtn onClick={handleSave}>保存食谱</PrimaryBtn>
+      </div>
+    </div>
+  );
+}
