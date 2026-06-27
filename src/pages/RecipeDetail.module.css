@@ -3,6 +3,31 @@
 .editBtn { font-size: 15px; font-weight: 600; color: var(--amber); background: none; border: none; padding: 8px 4px; }
 .content { padding: 0 20px; }
 
+.cover {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: var(--amber-pale);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.coverImg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.coverEmpty {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+}
+.coverBtn {
+  position: absolute;
+  bottom: 10px; right: 12px;
+  background: rgba(0,0,0,0.45);
+  color: white;
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
 .name { font-size: 24px; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
 .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .badge { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--amber-pale); color: var(--brown); font-weight: 500; }

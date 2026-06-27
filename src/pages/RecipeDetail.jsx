@@ -101,7 +101,7 @@ function StartModal({ show, onClose, recipe, onConfirm }) {
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { recipes, ingLib, recipeCost, getPortion, setPortion } = useApp();
+  const { recipes, ingLib, recipeCost, getPortion, setPortion, saveRecipe } = useApp();
 
   const recipe = recipes.find(r => r.id === id);
   if (!recipe) return <div style={{ padding: 20 }}>食谱不存在</div>;
@@ -110,6 +110,24 @@ export default function RecipeDetail() {
   const ratio = portion / recipe.portion;
   const totalCost = recipeCost(recipe, portion);
   const [showStart, setShowStart] = useState(false);
+
+  async function handleCoverUpload(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+      const base64 = e.target.result.split(',')[1];
+      const ext = file.name.split('.').pop().toLowerCase();
+      const API = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API}/api/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, ext }),
+      });
+      const { url } = await res.json();
+      await saveRecipe({ ...recipe, coverImage: url });
+    };
+    reader.readAsDataURL(file);
+  }
 
   function handleConfirmStart(startMin) {
     setShowStart(false);
@@ -121,6 +139,18 @@ export default function RecipeDetail() {
       <div className={styles.nav}>
         <BackBtn onClick={() => navigate('/')} />
         <button className={styles.editBtn} onClick={() => navigate(`/recipe/${id}/edit`)}>编辑</button>
+      </div>
+
+      <div className={styles.cover}>
+        {recipe.coverImage
+          ? <img src={`${import.meta.env.VITE_API_URL || ''}${recipe.coverImage}`} className={styles.coverImg} alt="封面" />
+          : <div className={styles.coverEmpty}>🍞</div>
+        }
+        <label className={styles.coverBtn}>
+          {recipe.coverImage ? '更换图片' : '上传图片'}
+          <input type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={e => handleCoverUpload(e.target.files[0])} />
+        </label>
       </div>
 
       <div className={styles.content}>
