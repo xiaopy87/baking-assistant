@@ -1,6 +1,11 @@
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
 import Database from 'better-sqlite3';
 import { INITIAL_ING_LIB, INITIAL_RECIPES } from './src/data/initialData.js';
+
+// 确保 uploads 目录存在
+if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
 const API_KEY = process.env.DASHSCOPE_API_KEY;
 const PORT = 3001;
@@ -94,6 +99,28 @@ async function handleRequest(req, res) {
     const id = path.split('/')[3];
     db.prepare('DELETE FROM ing_lib WHERE id = ?').run(id);
     return json(res, { ok: true });
+  }
+
+  // ── 封面上传 ──
+  if (path === '/api/upload' && method === 'POST') {
+    const { imageBase64, ext = 'jpg' } = await readBody(req);
+    const filename = `${Date.now()}.${ext}`;
+    const filepath = path.join('uploads', filename);
+    fs.writeFileSync(filepath, Buffer.from(imageBase64, 'base64'));
+    return json(res, { url: `/uploads/${filename}` });
+  }
+
+  // ── 静态文件（封面图）──
+  if (path.startsWith('/uploads/')) {
+    const filepath = path.join('.', path);
+    if (fs.existsSync(filepath)) {
+      const ext = path.split('.').pop().toLowerCase();
+      const mime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[ext] || 'image/jpeg';
+      res.writeHead(200, { 'Content-Type': mime, 'Access-Control-Allow-Origin': '*' });
+      fs.createReadStream(filepath).pipe(res);
+      return;
+    }
+    res.writeHead(404); res.end(); return;
   }
 
   // ── 识图 API ──

@@ -220,7 +220,10 @@ export default function RecipeList() {
             return (
               <div key={r.id} className={styles.gridCard} onClick={() => navigate(`/recipe/${r.id}`)}>
                 <div className={styles.gridThumb}>
-                  <span className={styles.gridEmoji}>{r.tag?.match(/\p{Emoji}/u)?.[0] || '🍞'}</span>
+                  {r.coverImage
+                    ? <img src={`${import.meta.env.VITE_API_URL || ''}${r.coverImage}`} className={styles.gridCover} alt={r.name} />
+                    : <span className={styles.gridEmoji}>{r.tag?.match(/\p{Emoji}/u)?.[0] || '🍞'}</span>
+                  }
                 </div>
                 <div className={styles.gridName}>{r.name}</div>
                 <div className={styles.gridTags}>

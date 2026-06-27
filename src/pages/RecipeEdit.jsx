@@ -17,6 +17,7 @@ export default function RecipeEdit() {
   const original = recipes.find(r => r.id === id);
   if (!original) return <div style={{ padding: 20 }}>食谱不存在</div>;
 
+  const [coverImage, setCoverImage] = useState(original.coverImage || null);
   const [name, setName] = useState(original.name);
   const [tag, setTag] = useState(original.tag);
   const [category, setCategory] = useState(original.category || '');
@@ -94,6 +95,25 @@ export default function RecipeEdit() {
     }));
   }
 
+  async function handleCoverUpload(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      const ext = file.name.split('.').pop().toLowerCase();
+      const API = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API}/api/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, ext }),
+      });
+      const { url } = await res.json();
+      setCoverImage(url);
+    };
+    reader.readAsDataURL(file);
+  }
+
   async function handleSave() {
     // 根据 parGroup 自动配对 parWith 和 serial
     const processedDays = days.map(day => {
@@ -114,7 +134,7 @@ export default function RecipeEdit() {
       });
       return { ...day, tasks: processed };
     });
-    await saveRecipe({ ...original, name, tag, category, subCategory, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays });
+    await saveRecipe({ ...original, name, tag, category, subCategory, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays, coverImage });
     navigate(`/recipe/${id}`);
   }
 
@@ -126,6 +146,16 @@ export default function RecipeEdit() {
       </div>
 
       <div className={styles.content}>
+        <SectionTitle>封面图片</SectionTitle>
+        <label className={styles.coverUpload}>
+          {coverImage
+            ? <img src={`${import.meta.env.VITE_API_URL || ''}${coverImage}`} className={styles.coverPreview} alt="封面" />
+            : <div className={styles.coverPlaceholder}><span>📷</span><span>点击上传封面</span></div>
+          }
+          <input type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={e => handleCoverUpload(e.target.files[0])} />
+        </label>
+
         <SectionTitle>基本信息</SectionTitle>
         <Field label="食谱名称"><TextInput value={name} onChange={setName} /></Field>
         <Field label="标签"><TextInput value={tag} onChange={setTag} /></Field>

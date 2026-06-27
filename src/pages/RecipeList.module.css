@@ -152,6 +152,7 @@
   background: var(--amber-pale);
   color: var(--amber);
 }
+.gridCover { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Import modal */
 .uploadZone {
