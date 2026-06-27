@@ -209,27 +209,28 @@ export default function RecipeList() {
           <span className={styles.recipeCount}>{filtered.length} 个</span>
         </SectionLabel>
 
-        {filtered.map((r, idx) => {
-          const p = getPortion(r.id, r.portion);
-          const cost = recipeCost(r, p);
-          const totalDays = r.days.length;
-          const serialMin = r.days.flatMap(d => d.tasks.filter(t => t.serial))
-            .reduce((a, t) => a + t.totalSec / 60, 0);
-          const hrs = Math.floor(serialMin / 60);
-          const mins = Math.round(serialMin % 60);
-          return (
-            <Card key={r.id} featured={idx === 0} onClick={() => navigate(`/recipe/${r.id}`)}>
-              <div className={styles.recipeTag}>{r.tag}</div>
-              <div className={styles.recipeName}>{r.name}</div>
-              <div className={styles.recipeMeta}>
-                <span>📅 {totalDays > 1 ? `${totalDays}天` : '当天'}</span>
-                <span>⏱ {hrs > 0 ? `${hrs}小时` : ''}{mins > 0 ? `${mins}分` : ''}</span>
-                <span>🍽 {p}{r.portionUnit}</span>
-                <span>💰 {fmtCost(cost)}</span>
+        <div className={styles.grid}>
+          {filtered.map(r => {
+            const totalDays = r.days.length;
+            const serialMin = r.days.flatMap(d => d.tasks.filter(t => t.serial))
+              .reduce((a, t) => a + t.totalSec / 60, 0);
+            const hrs = Math.floor(serialMin / 60);
+            const mins = Math.round(serialMin % 60);
+            const timeStr = hrs > 0 ? `${hrs}h${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
+            return (
+              <div key={r.id} className={styles.gridCard} onClick={() => navigate(`/recipe/${r.id}`)}>
+                <div className={styles.gridThumb}>
+                  <span className={styles.gridEmoji}>{r.tag?.match(/\p{Emoji}/u)?.[0] || '🍞'}</span>
+                </div>
+                <div className={styles.gridName}>{r.name}</div>
+                <div className={styles.gridTags}>
+                  <span className={styles.gridTag}>{totalDays > 1 ? `${totalDays}天` : '当天'}</span>
+                  <span className={styles.gridTag}>⏱{timeStr}</span>
+                </div>
               </div>
-            </Card>
-          );
-        })}
+            );
+          })}
+        </div>
 
         {filtered.length === 0 && (
           <div className={styles.empty}>

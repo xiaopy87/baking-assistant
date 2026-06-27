@@ -109,6 +109,50 @@
 
 .empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
 
+/* 网格列表 */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.gridCard {
+  background: white;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  active { opacity: 0.8; }
+}
+.gridThumb {
+  background: var(--amber-pale);
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gridEmoji { font-size: 40px; }
+.gridName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brown);
+  padding: 8px 10px 4px;
+  line-height: 1.4;
+}
+.gridTags {
+  display: flex;
+  gap: 4px;
+  padding: 0 10px 8px;
+  flex-wrap: wrap;
+}
+.gridTag {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: var(--amber-pale);
+  color: var(--amber);
+}
+
 /* Import modal */
 .uploadZone {
   border: 2px dashed var(--amber-light);
