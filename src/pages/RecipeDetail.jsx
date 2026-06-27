@@ -152,6 +152,7 @@ export default function RecipeDetail() {
         <label className={styles.coverBtn}>
           {recipe.coverImage ? '更换图片' : '上传图片'}
           <input type="file" accept="image/*" style={{ display: 'none' }}
+            onClick={e => { e.target.value = ''; }}
             onChange={e => handleCoverSelect(e.target.files[0])} />
         </label>
       </div>
