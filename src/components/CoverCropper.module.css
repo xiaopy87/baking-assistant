@@ -1,0 +1,11 @@
+.cropWrap {
+  width: 100%;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: center;
+}
+.cropImg {
+  max-width: 100%;
+  max-height: 60vh;
+  display: block;
+}

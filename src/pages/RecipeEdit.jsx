@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { BackBtn, SectionTitle, PrimaryBtn, Field, TextInput } from '../components/UI';
+import { CoverCropper } from '../components/CoverCropper';
 import { CATEGORIES } from '../data/categories';
 import styles from './RecipeEdit.module.css';
 
@@ -18,6 +19,7 @@ export default function RecipeEdit() {
   if (!original) return <div style={{ padding: 20 }}>食谱不存在</div>;
 
   const [coverImage, setCoverImage] = useState(original.coverImage || null);
+  const [cropSrc, setCropSrc] = useState(null);
   const [name, setName] = useState(original.name);
   const [tag, setTag] = useState(original.tag);
   const [category, setCategory] = useState(original.category || '');
@@ -95,31 +97,24 @@ export default function RecipeEdit() {
     }));
   }
 
-  async function handleCoverUpload(file) {
+  function handleCoverSelect(file) {
     if (!file) return;
-    console.log('[封面] 选择文件:', file.name, file.size);
     const reader = new FileReader();
-    reader.onload = async e => {
-      try {
-        const dataUrl = e.target.result;
-        const base64 = dataUrl.split(',')[1];
-        const ext = file.name.split('.').pop().toLowerCase();
-        const API = import.meta.env.VITE_API_URL || '';
-        console.log('[封面] 上传到:', `${API}/api/upload`);
-        const res = await fetch(`${API}/api/upload`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64: base64, ext }),
-        });
-        const data = await res.json();
-        console.log('[封面] 响应:', data);
-        setCoverImage(data.url);
-      } catch (e) {
-        console.error('[封面] 上传失败:', e);
-      }
-    };
+    reader.onload = e => setCropSrc(e.target.result);
     reader.readAsDataURL(file);
   }
+
+  const handleCropConfirm = useCallback(async (base64) => {
+    setCropSrc(null);
+    const API = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${API}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: base64, ext: 'jpg' }),
+    });
+    const { url } = await res.json();
+    setCoverImage(url);
+  }, []);
 
   async function handleSave() {
     // 根据 parGroup 自动配对 parWith 和 serial
@@ -160,7 +155,7 @@ export default function RecipeEdit() {
             : <div className={styles.coverPlaceholder}><span>📷</span><span>点击上传封面</span></div>
           }
           <input type="file" accept="image/*" style={{ display: 'none' }}
-            onChange={e => handleCoverUpload(e.target.files[0])} />
+            onChange={e => handleCoverSelect(e.target.files[0])} />
         </label>
 
         <SectionTitle>基本信息</SectionTitle>
@@ -295,6 +290,13 @@ export default function RecipeEdit() {
 
         <PrimaryBtn onClick={handleSave}>保存食谱</PrimaryBtn>
       </div>
+
+      <CoverCropper
+        show={!!cropSrc}
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onConfirm={handleCropConfirm}
+      />
     </div>
   );
 }

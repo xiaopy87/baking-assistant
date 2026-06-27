@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../store/AppContext';
 import { BackBtn, SectionTitle, PrimaryBtn, Modal, Field, TextInput } from '../components/UI';
+import { CoverCropper } from '../components/CoverCropper';
 import styles from './RecipeDetail.module.css';
 
 const CUTOFF = 22 * 60 + 30;
@@ -110,24 +111,26 @@ export default function RecipeDetail() {
   const ratio = portion / recipe.portion;
   const totalCost = recipeCost(recipe, portion);
   const [showStart, setShowStart] = useState(false);
+  const [cropSrc, setCropSrc] = useState(null);
 
-  async function handleCoverUpload(file) {
+  function handleCoverSelect(file) {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = async e => {
-      const base64 = e.target.result.split(',')[1];
-      const ext = file.name.split('.').pop().toLowerCase();
-      const API = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${API}/api/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, ext }),
-      });
-      const { url } = await res.json();
-      await saveRecipe({ ...recipe, coverImage: url });
-    };
+    reader.onload = e => setCropSrc(e.target.result);
     reader.readAsDataURL(file);
   }
+
+  const handleCropConfirm = useCallback(async (base64) => {
+    setCropSrc(null);
+    const API = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${API}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: base64, ext: 'jpg' }),
+    });
+    const { url } = await res.json();
+    await saveRecipe({ ...recipe, coverImage: url });
+  }, [recipe, saveRecipe]);
 
   function handleConfirmStart(startMin) {
     setShowStart(false);
@@ -149,7 +152,7 @@ export default function RecipeDetail() {
         <label className={styles.coverBtn}>
           {recipe.coverImage ? '更换图片' : '上传图片'}
           <input type="file" accept="image/*" style={{ display: 'none' }}
-            onChange={e => handleCoverUpload(e.target.files[0])} />
+            onChange={e => handleCoverSelect(e.target.files[0])} />
         </label>
       </div>
 
@@ -252,6 +255,12 @@ export default function RecipeDetail() {
         onClose={() => setShowStart(false)}
         recipe={recipe}
         onConfirm={handleConfirmStart}
+      />
+      <CoverCropper
+        show={!!cropSrc}
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onConfirm={handleCropConfirm}
       />
     </div>
   );
