@@ -1,6 +1,6 @@
 import http from 'http';
 import fs from 'fs';
-import path from 'path';
+import { join } from 'path';
 import Database from 'better-sqlite3';
 import { INITIAL_ING_LIB, INITIAL_RECIPES } from './src/data/initialData.js';
 
@@ -105,16 +105,16 @@ async function handleRequest(req, res) {
   if (path === '/api/upload' && method === 'POST') {
     const { imageBase64, ext = 'jpg' } = await readBody(req);
     const filename = `${Date.now()}.${ext}`;
-    const filepath = path.join('uploads', filename);
+    const filepath = join('uploads', filename);
     fs.writeFileSync(filepath, Buffer.from(imageBase64, 'base64'));
     return json(res, { url: `/uploads/${filename}` });
   }
 
   // ── 静态文件（封面图）──
   if (path.startsWith('/uploads/')) {
-    const filepath = path.join('.', path);
+    const filepath = join('.', path);
     if (fs.existsSync(filepath)) {
-      const ext = path.split('.').pop().toLowerCase();
+      const ext = filepath.split('.').pop().toLowerCase();
       const mime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[ext] || 'image/jpeg';
       res.writeHead(200, { 'Content-Type': mime, 'Access-Control-Allow-Origin': '*' });
       fs.createReadStream(filepath).pipe(res);

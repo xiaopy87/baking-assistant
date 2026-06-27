@@ -97,19 +97,26 @@ export default function RecipeEdit() {
 
   async function handleCoverUpload(file) {
     if (!file) return;
+    console.log('[封面] 选择文件:', file.name, file.size);
     const reader = new FileReader();
     reader.onload = async e => {
-      const dataUrl = e.target.result;
-      const base64 = dataUrl.split(',')[1];
-      const ext = file.name.split('.').pop().toLowerCase();
-      const API = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${API}/api/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, ext }),
-      });
-      const { url } = await res.json();
-      setCoverImage(url);
+      try {
+        const dataUrl = e.target.result;
+        const base64 = dataUrl.split(',')[1];
+        const ext = file.name.split('.').pop().toLowerCase();
+        const API = import.meta.env.VITE_API_URL || '';
+        console.log('[封面] 上传到:', `${API}/api/upload`);
+        const res = await fetch(`${API}/api/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64, ext }),
+        });
+        const data = await res.json();
+        console.log('[封面] 响应:', data);
+        setCoverImage(data.url);
+      } catch (e) {
+        console.error('[封面] 上传失败:', e);
+      }
     };
     reader.readAsDataURL(file);
   }
