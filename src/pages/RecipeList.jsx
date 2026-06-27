@@ -243,7 +243,10 @@ export default function RecipeList() {
             const timeStr = hrs > 0 ? `${hrs}h${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
             return (
               <div key={r.id} className={styles.gridCard} onClick={() => navigate(`/recipe/${r.id}`)}>
-                <div className={r.coverImage ? styles.gridThumb : styles.gridThumbSmall}>
+                <div
+                  className={r.coverImage ? styles.gridThumb : styles.gridThumbSmall}
+                  style={r.coverImage && r.coverAspect ? { aspectRatio: r.coverAspect } : undefined}
+                >
                   {r.coverImage
                     ? <img src={`${import.meta.env.VITE_API_URL || ''}${r.coverImage}`} className={styles.gridCover} alt={r.name} />
                     : <span className={styles.gridEmoji}>{r.tag?.match(/\p{Emoji}/u)?.[0] || '🍞'}</span>

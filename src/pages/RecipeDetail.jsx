@@ -120,7 +120,7 @@ export default function RecipeDetail() {
     reader.readAsDataURL(file);
   }
 
-  const handleCropConfirm = useCallback(async (base64) => {
+  const handleCropConfirm = useCallback(async (base64, aspect) => {
     setCropSrc(null);
     const API = import.meta.env.VITE_API_URL || '';
     const res = await fetch(`${API}/api/upload`, {
@@ -129,7 +129,7 @@ export default function RecipeDetail() {
       body: JSON.stringify({ imageBase64: base64, ext: 'jpg' }),
     });
     const { url } = await res.json();
-    await saveRecipe({ ...recipe, coverImage: url });
+    await saveRecipe({ ...recipe, coverImage: url, coverAspect: aspect });
   }, [recipe, saveRecipe]);
 
   function handleConfirmStart(startMin) {
@@ -144,7 +144,7 @@ export default function RecipeDetail() {
         <button className={styles.editBtn} onClick={() => navigate(`/recipe/${id}/edit`)}>编辑</button>
       </div>
 
-      <div className={styles.cover}>
+      <div className={styles.cover} style={recipe.coverAspect ? { aspectRatio: recipe.coverAspect } : undefined}>
         {recipe.coverImage
           ? <img src={`${import.meta.env.VITE_API_URL || ''}${recipe.coverImage}`} className={styles.coverImg} alt="封面" />
           : <div className={styles.coverEmpty}>🍞</div>

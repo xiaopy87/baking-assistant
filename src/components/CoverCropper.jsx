@@ -4,61 +4,80 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { Modal, PrimaryBtn } from './UI';
 import styles from './CoverCropper.module.css';
 
-const ASPECT = 3 / 4; // 封面比例（竖向）
+const RATIOS = [
+  { label: '竖版', value: 3 / 4 },
+  { label: '横版', value: 4 / 3 },
+];
 
-function centerAspectCrop(width, height) {
+function centerAspectCrop(aspect, width, height) {
   return centerCrop(
-    makeAspectCrop({ unit: '%', width: 90 }, ASPECT, width, height),
+    makeAspectCrop({ unit: '%', width: 90 }, aspect, width, height),
     width, height,
   );
 }
 
 export function CoverCropper({ show, imageSrc, onCancel, onConfirm }) {
+  const [aspectIdx, setAspectIdx] = useState(0);
   const [crop, setCrop] = useState();
   const [completedCrop, setCompletedCrop] = useState();
   const imgRef = useRef(null);
 
+  const aspect = RATIOS[aspectIdx].value;
+
   function onImageLoad(e) {
     const { width, height } = e.currentTarget;
-    setCrop(centerAspectCrop(width, height));
+    setCrop(centerAspectCrop(aspect, width, height));
+  }
+
+  function handleRatioChange(idx) {
+    setAspectIdx(idx);
+    const img = imgRef.current;
+    if (img) setCrop(centerAspectCrop(RATIOS[idx].value, img.width, img.height));
   }
 
   const handleConfirm = useCallback(() => {
     const img = imgRef.current;
     if (!img || !completedCrop) return;
 
-    const canvas = document.createElement('canvas');
     const scaleX = img.naturalWidth / img.width;
     const scaleY = img.naturalHeight / img.height;
-
+    const canvas = document.createElement('canvas');
     canvas.width = Math.round(completedCrop.width * scaleX);
     canvas.height = Math.round(completedCrop.height * scaleY);
 
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(
+    canvas.getContext('2d').drawImage(
       img,
       completedCrop.x * scaleX,
       completedCrop.y * scaleY,
       completedCrop.width * scaleX,
       completedCrop.height * scaleY,
-      0, 0,
-      canvas.width,
-      canvas.height,
+      0, 0, canvas.width, canvas.height,
     );
 
-    const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-    onConfirm(base64);
+    onConfirm(canvas.toDataURL('image/jpeg', 0.9).split(',')[1], aspect);
   }, [completedCrop, onConfirm]);
 
   return (
-    <Modal show={show} onClose={onCancel} title="裁剪封面" subtitle="拖拽调整裁剪区域">
+    <Modal show={show} onClose={onCancel} title="裁剪封面" subtitle="选择比例，拖拽调整裁剪区域">
+      <div className={styles.ratioTabs}>
+        {RATIOS.map((r, i) => (
+          <button
+            key={r.label}
+            className={`${styles.ratioTab} ${i === aspectIdx ? styles.ratioActive : ''}`}
+            onClick={() => handleRatioChange(i)}
+          >
+            <span className={`${styles.ratioIcon} ${r.value < 1 ? styles.portrait : styles.landscape}`} />
+            {r.label}
+          </button>
+        ))}
+      </div>
       {imageSrc && (
         <div className={styles.cropWrap}>
           <ReactCrop
             crop={crop}
             onChange={c => setCrop(c)}
             onComplete={c => setCompletedCrop(c)}
-            aspect={ASPECT}
+            aspect={aspect}
             minWidth={50}
           >
             <img ref={imgRef} src={imageSrc} onLoad={onImageLoad} className={styles.cropImg} alt="裁剪预览" />

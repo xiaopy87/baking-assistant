@@ -19,6 +19,7 @@ export default function RecipeEdit() {
   if (!original) return <div style={{ padding: 20 }}>食谱不存在</div>;
 
   const [coverImage, setCoverImage] = useState(original.coverImage || null);
+  const [coverAspect, setCoverAspect] = useState(original.coverAspect || 3/4);
   const [cropSrc, setCropSrc] = useState(null);
   const [name, setName] = useState(original.name);
   const [tag, setTag] = useState(original.tag);
@@ -104,7 +105,7 @@ export default function RecipeEdit() {
     reader.readAsDataURL(file);
   }
 
-  const handleCropConfirm = useCallback(async (base64) => {
+  const handleCropConfirm = useCallback(async (base64, aspect) => {
     setCropSrc(null);
     const API = import.meta.env.VITE_API_URL || '';
     const res = await fetch(`${API}/api/upload`, {
@@ -114,6 +115,7 @@ export default function RecipeEdit() {
     });
     const { url } = await res.json();
     setCoverImage(url);
+    setCoverAspect(aspect);
   }, []);
 
   async function handleSave() {
@@ -136,7 +138,7 @@ export default function RecipeEdit() {
       });
       return { ...day, tasks: processed };
     });
-    await saveRecipe({ ...original, name, tag, category, subCategory, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays, coverImage });
+    await saveRecipe({ ...original, name, tag, category, subCategory, portion: Number(portion), portionUnit, notes, ingGroups, days: processedDays, coverImage, coverAspect });
     navigate(`/recipe/${id}`);
   }
 
