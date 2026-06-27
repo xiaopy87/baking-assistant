@@ -5,8 +5,8 @@ import { Modal, PrimaryBtn } from './UI';
 import styles from './CoverCropper.module.css';
 
 const RATIOS = [
-  { label: '竖版', value: 3 / 4 },
-  { label: '横版', value: 4 / 3 },
+  { label: '竖版 3:4', value: 3 / 4 },
+  { label: '横版 16:9', value: 16 / 9 },
 ];
 
 function centerAspectCrop(aspect, width, height) {
