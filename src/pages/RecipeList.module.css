@@ -134,10 +134,14 @@
   justify-content: center;
   overflow: hidden;
 }
-/* 偶数卡片图片更高，增加错落感 */
-.gridCard:nth-child(even) .gridThumb { aspect-ratio: 2 / 3; }
-.gridCard:nth-child(3n) .gridThumb { aspect-ratio: 1 / 1; }
-.gridEmoji { font-size: 40px; }
+.gridThumbSmall {
+  background: var(--amber-pale);
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gridEmoji { font-size: 32px; }
 .gridName {
   font-size: 13px;
   font-weight: 600;
