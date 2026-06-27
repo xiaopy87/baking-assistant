@@ -123,6 +123,71 @@ async function handleRequest(req, res) {
     res.writeHead(404); res.end(); return;
   }
 
+  // ── 文字识别 API ──
+  if (path === '/api/recognize-text' && method === 'POST') {
+    const { text } = await readBody(req);
+    console.log('[文字识别] 长度:', text.length);
+
+    const prompt = `请根据以下食谱文字，提取所有信息，严格按照以下JSON格式返回，不要有任何多余文字：
+{
+  "name": "食谱名称",
+  "tag": "分类（如：面包、蛋糕、饼干等）",
+  "portion": 数字,
+  "portionUnit": "单位（如：个、片、条）",
+  "notes": "注意事项，多条用换行分隔",
+  "ingGroups": [
+    {
+      "groupName": "分组名（如：主料、配料）",
+      "ings": [
+        { "name": "食材名", "amount": 数字, "unit": "单位（g/ml/pcs等）" }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "label": "第1天",
+      "tasks": [
+        {
+          "id": "唯一短id如t1",
+          "name": "步骤简短标题（10字以内）",
+          "meta": "详细操作说明（补充温度/手法/注意点，与name不重复）",
+          "totalSec": 秒数,
+          "serial": true,
+          "parGroup": null,
+          "parWith": null
+        }
+      ]
+    }
+  ]
+}
+
+若两个步骤可同时进行（如"发酵"和"预热烤箱"），给相同parGroup（如"A"），互相填parWith，耗时长的serial为true，另一个为false。
+
+食谱文字如下：
+${text}`;
+
+    const apiRes = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'qwen-plus',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    const data = await apiRes.json();
+    if (!apiRes.ok) return json(res, { error: `API错误: ${data.message || apiRes.status}` }, 502);
+
+    const content = data.choices?.[0]?.message?.content ?? '';
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return json(res, { error: '解析失败，请重试' }, 422);
+
+    console.log('[文字识别] 成功');
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(jsonMatch[0]);
+    return;
+  }
+
   // ── 识图 API ──
   if (path === '/api/recognize' && method === 'POST') {
     const { imageBase64 } = await readBody(req);

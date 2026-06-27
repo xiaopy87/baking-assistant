@@ -9,11 +9,24 @@ const WORKER_URL = import.meta.env.VITE_API_URL || 'https://baking-assistant-api
 
 function fmtCost(n) { return '¥' + n.toFixed(1); }
 
+function parseRecipe(data) {
+  return {
+    ...data,
+    id: 'imported_' + Date.now(),
+    ingGroups: (data.ingGroups || []).map(g => ({
+      ...g,
+      ings: (g.ings || []).map(ing => ({ ...ing, ingId: ing.name })),
+    })),
+  };
+}
+
 function ImportModal({ show, onClose }) {
   const { saveRecipe } = useApp();
-  const [step, setStep] = useState('upload');
+  const [mode, setMode] = useState('image'); // image | text
+  const [step, setStep] = useState('input'); // input | processing | done | error
   const [preview, setPreview] = useState(null);
   const [imageBase64, setImageBase64] = useState(null);
+  const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -36,29 +49,19 @@ function ImportModal({ show, onClose }) {
     img.src = url;
   }
 
-  async function handleRecognize() {
-    if (!imageBase64) return;
+  async function handleSubmit() {
     setStep('processing');
-    console.log('[识别] 开始，图片大小:', Math.round(imageBase64.length / 1024), 'KB');
     try {
-      const res = await fetch(`${WORKER_URL}/api/recognize`, {
+      const endpoint = mode === 'image' ? '/api/recognize' : '/api/recognize-text';
+      const body = mode === 'image' ? { imageBase64 } : { text };
+      const res = await fetch(`${WORKER_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64 }),
+        body: JSON.stringify(body),
       });
-      console.log('[识别] Worker 响应状态:', res.status);
       const data = await res.json();
-      console.log('[识别] 返回数据:', data);
       if (!res.ok || data.error) throw new Error(data.error || '识别失败');
-      const recipe = {
-        ...data,
-        id: 'imported_' + Date.now(),
-        ingGroups: (data.ingGroups || []).map(g => ({
-          ...g,
-          ings: (g.ings || []).map(ing => ({ ...ing, ingId: ing.name })),
-        })),
-      };
-      setResult(recipe);
+      setResult(parseRecipe(data));
       setStep('done');
     } catch (e) {
       setErrorMsg(e.message || '网络错误，请重试');
@@ -72,31 +75,52 @@ function ImportModal({ show, onClose }) {
   }
 
   function handleClose() {
-    setStep('upload');
+    setStep('input');
     setPreview(null);
     setImageBase64(null);
+    setText('');
     setResult(null);
     setErrorMsg('');
     onClose();
   }
 
+  const canSubmit = mode === 'image' ? !!imageBase64 : text.trim().length > 10;
+
   return (
-    <Modal show={show} onClose={handleClose} title="📷 拍照导入食谱" subtitle="上传食谱照片，AI 自动识别食材、步骤、烤箱参数">
-      {step === 'upload' && (
+    <Modal show={show} onClose={handleClose} title="导入食谱" subtitle="AI 自动识别食材、步骤、烤箱参数">
+      {step === 'input' && (
         <>
-          <label className={styles.uploadZone}>
-            {preview
-              ? <img src={preview} className={styles.previewImg} alt="预览" />
-              : <>
-                  <div className={styles.uploadIcon}>🖼️</div>
-                  <div className={styles.uploadText}>点击上传食谱照片</div>
-                  <div className={styles.uploadSub}>支持截图、拍照、网页保存图片</div>
-                </>
-            }
-            <input type="file" accept="image/*" style={{ display: 'none' }}
-              onChange={e => handleFile(e.target.files[0])} />
-          </label>
-          <PrimaryBtn onClick={handleRecognize} disabled={!imageBase64}>识别食谱</PrimaryBtn>
+          <div className={styles.modeTabs}>
+            <button className={`${styles.modeTab} ${mode === 'image' ? styles.modeActive : ''}`} onClick={() => setMode('image')}>📷 拍照上传</button>
+            <button className={`${styles.modeTab} ${mode === 'text' ? styles.modeActive : ''}`} onClick={() => setMode('text')}>📝 文字输入</button>
+          </div>
+
+          {mode === 'image' && (
+            <label className={styles.uploadZone}>
+              {preview
+                ? <img src={preview} className={styles.previewImg} alt="预览" />
+                : <>
+                    <div className={styles.uploadIcon}>🖼️</div>
+                    <div className={styles.uploadText}>点击上传食谱照片</div>
+                    <div className={styles.uploadSub}>支持截图、拍照、网页保存图片</div>
+                  </>
+              }
+              <input type="file" accept="image/*" style={{ display: 'none' }}
+                onChange={e => handleFile(e.target.files[0])} />
+            </label>
+          )}
+
+          {mode === 'text' && (
+            <textarea
+              className={styles.textInput}
+              value={text}
+              onChange={e => setText(e.target.value)}
+              placeholder={'把食谱文字粘贴到这里，比如：\n\n戚风蛋糕\n低筋面粉85g、鸡蛋4个、牛奶50ml...\n步骤1: 分离蛋黄蛋白...'}
+              rows={8}
+            />
+          )}
+
+          <PrimaryBtn onClick={handleSubmit} disabled={!canSubmit}>AI 识别食谱</PrimaryBtn>
         </>
       )}
       {step === 'processing' && (
@@ -122,7 +146,7 @@ function ImportModal({ show, onClose }) {
             <div className={styles.errorTitle}>❌ 识别失败</div>
             <div className={styles.doneSub}>{errorMsg}</div>
           </div>
-          <PrimaryBtn onClick={() => setStep('upload')}>重新上传</PrimaryBtn>
+          <PrimaryBtn onClick={() => setStep('input')}>重试</PrimaryBtn>
         </>
       )}
     </Modal>
