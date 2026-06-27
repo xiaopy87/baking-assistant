@@ -4,7 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { Modal, PrimaryBtn } from './UI';
 import styles from './CoverCropper.module.css';
 
-const ASPECT = 3 / 2; // 封面比例
+const ASPECT = 3 / 4; // 封面比例（竖向）
 
 function centerAspectCrop(width, height) {
   return centerCrop(

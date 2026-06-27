@@ -109,28 +109,34 @@
 
 .empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
 
-/* 网格列表 */
+/* 瀑布流列表 */
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  columns: 2;
+  column-gap: 10px;
   margin-bottom: 16px;
 }
 .gridCard {
+  break-inside: avoid;
   background: white;
   border-radius: var(--radius-sm);
   overflow: hidden;
   box-shadow: var(--shadow);
   cursor: pointer;
-  active { opacity: 0.8; }
+  margin-bottom: 10px;
+  display: inline-block;
+  width: 100%;
 }
 .gridThumb {
   background: var(--amber-pale);
-  height: 90px;
+  aspect-ratio: 3 / 4;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
+/* 偶数卡片图片更高，增加错落感 */
+.gridCard:nth-child(even) .gridThumb { aspect-ratio: 2 / 3; }
+.gridCard:nth-child(3n) .gridThumb { aspect-ratio: 1 / 1; }
 .gridEmoji { font-size: 40px; }
 .gridName {
   font-size: 13px;

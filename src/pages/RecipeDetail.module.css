@@ -6,7 +6,7 @@
 .cover {
   position: relative;
   width: 100%;
-  height: 200px;
+  aspect-ratio: 3 / 4;
   background: var(--amber-pale);
   overflow: hidden;
   margin-bottom: 16px;
